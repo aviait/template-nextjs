@@ -1,0 +1,24 @@
+name: pr-validate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [development, homologation, production, sandbox]
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+jobs:
+  validate:
+    uses: aviait/deploy-templates/.github/workflows/v2-pr-validate.yml@main
+    with:
+      repo_type: bff
+      lint_cmd: ${{ vars.LINT_CMD || 'npm run lint && npm run format:check' }}
+      typecheck_cmd: ${{ vars.TYPECHECK_CMD || 'npm run typecheck' }}
+      test_cmd: ${{ vars.TEST_CMD || 'npm test' }}
+      target_environments: dev,hml,prd,sandbox
+    secrets:
+      CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
