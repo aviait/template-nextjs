@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Valida variáveis de ambiente obrigatórias na inicialização
 const required = [
-  { key: 'DATABASE_URL', validate: (v) => v.startsWith('postgresql://'), hint: 'deve ser uma URL PostgreSQL válida' },
+  {
+    key: 'DATABASE_URL',
+    validate: (v) => v.startsWith('postgresql://'),
+    hint: 'deve ser uma URL PostgreSQL válida',
+  },
   { key: 'SESSION_SECRET', validate: (v) => v.length >= 32, hint: 'deve ter ao menos 32 caracteres' },
   { key: 'ADMIN_PASSWORD', validate: (v) => v.length > 0, hint: 'não pode estar vazio' },
 ];
