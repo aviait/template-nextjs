@@ -1,0 +1,23 @@
+name: Development
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'src/**'
+      - 'prisma/**'
+      - 'scripts/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'next.config.ts'
+      - 'Dockerfile'
+
+jobs:
+  deploy:
+    uses: aviait/deploy-templates/.github/workflows/v2-bff.yml@main
+    with:
+      working_directory: .
+      package_manager: npm
+      cache_dependency_path: package-lock.json
+    secrets: inherit
