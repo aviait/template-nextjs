@@ -1,8 +1,8 @@
-name: next-v2-production
+name: next-v2-sandbox
 
 on:
   pull_request:
-    branches: [production]
+    branches: [sandbox]
     paths:
       - 'src/**'
       - 'prisma/**'
@@ -12,11 +12,9 @@ on:
       - 'package-lock.json'
       - 'next.config.ts'
       - 'Dockerfile'
-      - '.github/workflows/bff-production.yml'
+      - '.github/workflows/bff-sandbox.yml'
   push:
-    branches: [production]
-    tags:
-      - '*'
+    branches: [sandbox]
     paths:
       - 'src/**'
       - 'prisma/**'
@@ -26,7 +24,7 @@ on:
       - 'package-lock.json'
       - 'next.config.ts'
       - 'Dockerfile'
-      - '.github/workflows/bff-production.yml'
+      - '.github/workflows/bff-sandbox.yml'
   workflow_dispatch:
 
 permissions:
@@ -36,12 +34,11 @@ permissions:
   security-events: write
 
 concurrency:
-  group: next-v2-production-${{ github.ref }}
-  cancel-in-progress: false
+  group: next-v2-sandbox-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  next_prd:
-    if: ${{ !startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, format('refs/tags/{0}', vars.PIPELINE_SEMVER_PREFIX != '' && vars.PIPELINE_SEMVER_PREFIX || 'v')) }}
+  next_sandbox:
     permissions:
       contents: write
       actions: read
@@ -51,7 +48,7 @@ jobs:
     with:
       app_name: ${{ vars.APP_NAME }}
       runner_label: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
-      environment: ${{ vars.PIPELINE_ENV_PRD || 'prd' }}
+      environment: ${{ vars.PIPELINE_ENV_SANDBOX || 'sandbox' }}
       working_directory: '.'
       node_version: ${{ vars.NODE_VERSION || '22' }}
       package_manager: npm
@@ -65,11 +62,11 @@ jobs:
       image_namespace: ${{ vars.IMAGE_NAMESPACE }}
       image_name: ${{ vars.IMAGE_NAME }}
       semver_prefix: ${{ vars.PIPELINE_SEMVER_PREFIX || 'v' }}
-      enable_release: true
-      deploy_on_tag_only: ${{ vars.PIPELINE_ENABLE_PROD_FROM_BRANCH != 'true' }}
+      enable_release: false
+      deploy_on_tag_only: false
       inject_all_git_vars: ${{ vars.INJECT_ALL_GIT_VARS != 'false' }}
       git_vars_exclude: ${{ vars.GIT_VARS_EXCLUDE }}
-      dns_name: ${{ vars.DNS_NAME_PRD || vars.DNS_NAME }}
+      dns_name: ${{ vars.DNS_NAME_SANDBOX || vars.DNS_NAME }}
       container_port: ${{ fromJSON(vars.CONTAINER_PORT || '80') }}
       healthcheck_path: /api/health
       traefik_network: ${{ vars.TRAEFIK_NETWORK || 'traefik-public' }}
@@ -83,7 +80,7 @@ jobs:
       TS_AUTHKEY: ${{ secrets.TS_AUTHKEY }}
       CHECKOUT_TOKEN: ${{ secrets.CHECKOUT_TOKEN }}
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-      PEM_KEY: ${{ secrets.PEM_KEY_PRD || secrets.PEM_KEY }}
+      PEM_KEY: ${{ secrets.PEM_KEY_SANDBOX || secrets.PEM_KEY }}
       DEPLOY_REGISTRY_USERNAME: ${{ secrets.DEPLOY_REGISTRY_USERNAME }}
       DEPLOY_REGISTRY_PASSWORD: ${{ secrets.DEPLOY_REGISTRY_PASSWORD }}
-      DOCKER_RUN_ENVS_FILE: ${{ secrets.DOCKER_RUN_ENVS_FILE_PRD || secrets.DOCKER_RUN_ENVS_FILE }}
+      DOCKER_RUN_ENVS_FILE: ${{ secrets.DOCKER_RUN_ENVS_FILE_SANDBOX || secrets.DOCKER_RUN_ENVS_FILE }}

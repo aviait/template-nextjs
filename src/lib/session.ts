@@ -1,23 +1,21 @@
-import type { IronSessionOptions } from 'iron-session';
+import type { SessionOptions } from 'iron-session';
 import { getIronSession } from 'iron-session';
-import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 import { cookies } from 'next/headers';
 
 export interface SessionData {
   isAdmin?: boolean;
 }
 
-const SESSION_OPTIONS: IronSessionOptions = {
+const SESSION_OPTIONS: SessionOptions = {
   cookieName: 'app_session',
   password: process.env.SESSION_SECRET as string,
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 8, // 8h
+    maxAge: 60 * 60 * 8,
   },
 };
 
-export async function getSession(cookieStore?: ReadonlyRequestCookies) {
-  const store = cookieStore ?? (await cookies());
-  return getIronSession<SessionData>(store as Parameters<typeof getIronSession>[0], SESSION_OPTIONS);
+export async function getSession() {
+  return getIronSession<SessionData>(await cookies(), SESSION_OPTIONS);
 }
